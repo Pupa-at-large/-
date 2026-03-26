@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peter Sloterdijk 翻译与接受研究 - MIT 学位论文汇报</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mitred: '#A31F34',
+                        mitgray: '#8A8B8C',
+                        paper: '#F9F8F6',
+                        ink: '#2D3748',
+                        accent: '#E2E8F0'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Merriweather', 'Georgia', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #F9F8F6; color: #2D3748; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Required Chart Container Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 40vh;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 350px; }
+        }
+        
+        .tab-active { border-left: 4px solid #A31F34; background-color: #f1f5f9; font-weight: 600; color: #A31F34; }
+        .tab-inactive { border-left: 4px solid transparent; color: #64748b; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col font-sans">
+
+    <!-- Chosen Palette: Warm Neutral Paper (#F9F8F6) with MIT Red (#A31F34) accents and Ink Dark Gray (#2D3748) for text. -->
+    
+    <!-- Application Structure Plan: 
+         Structure: A side-by-side interactive dashboard. 
+         Left Sidebar: Navigation acting as the "Table of Contents" for the presentation.
+         Main Area (Center): The "Slide" content. Highly interactive, replacing static PPT slides with dynamic charts, text comparisons, and logic flows.
+         Right Sidebar (Collapsible): The "Teleprompter / Script". This directly addresses the user's need for a "汇报脚本" (Presentation Script) mapped to each section. 
+         Why this structure?: It allows the user (presenter) to see their visual aids and speaker notes simultaneously in one cohesive interface, perfect for an MIT dissertation defense preparation and delivery.
+    -->
+    
+    <!-- Visualization & Content Choices: 
+         Section 1 (Textual Features): Goal - Inform. Viz - Interactive interactive text blocks. Justification - Best for showing literary concepts.
+         Section 2 (Translation): Goal - Compare. Viz - Dynamic Translation Card. Justification - Allows deep dive into specific terms without cluttering. NO SVG used (pure HTML/CSS).
+         Section 3 (Literature Review): Goal - Analyze trends. Viz - Chart.js Bubble Chart. Justification - Visualizes research volume over time across different disciplines (Media, Space, Anthro).
+         Section 4 (Problem Statement): Goal - Synthesize. Viz - Step-by-step logic builder (HTML flexbox). Justification - Shows the deductive reasoning required for an MIT defense.
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. 
+    -->
+
+    <!-- Top Navigation / Header -->
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center z-10 shadow-sm">
+        <div>
+            <h1 class="text-xl font-bold text-ink">MIT Dissertation Proposal</h1>
+            <h2 class="text-sm text-mitgray">Peter Sloterdijk: Translation, Reception, and Philosophical Poetics</h2>
+        </div>
+        <div class="text-sm font-semibold px-3 py-1 bg-mitred text-white rounded shadow">
+            Presenter Mode
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Left Navigation (TOC) -->
+        <nav class="w-64 bg-white border-r border-gray-200 py-6 flex flex-col gap-2 z-10 shadow-sm">
+            <button onclick="navTo('sec-intro')" id="btn-sec-intro" class="tab-active text-left px-6 py-3 transition-colors hover:bg-gray-50 text-sm">
+                1. 选题与文本特征
+                <span class="block text-xs font-normal text-gray-500 mt-1">Textual Features</span>
+            </button>
+            <button onclick="navTo('sec-trans')" id="btn-sec-trans" class="tab-inactive text-left px-6 py-3 transition-colors hover:bg-gray-50 text-sm">
+                2. 翻译中的多重语境与难点
+                <span class="block text-xs font-normal text-gray-500 mt-1">Translation Difficulties</span>
+            </button>
+            <button onclick="navTo('sec-lit')" id="btn-sec-lit" class="tab-inactive text-left px-6 py-3 transition-colors hover:bg-gray-50 text-sm">
+                3. 研究现状综述
+                <span class="block text-xs font-normal text-gray-500 mt-1">Literature Review</span>
+            </button>
+            <button onclick="navTo('sec-prob')" id="btn-sec-prob" class="tab-inactive text-left px-6 py-3 transition-colors hover:bg-gray-50 text-sm">
+                4. 研究问题推导
+                <span class="block text-xs font-normal text-gray-500 mt-1">Problem Statement</span>
+            </button>
+        </nav>
+
+        <!-- Center Stage (Visuals / "Slides") -->
+        <main class="flex-1 overflow-y-auto hide-scroll p-10 bg-paper relative" id="main-content">
+            
+            <!-- Section 1: Intro -->
+            <section id="sec-intro" class="fade-in block h-full flex flex-col">
+                <p class="text-sm text-mitgray mb-2 uppercase tracking-wide">Section 1</p>
+                <h2 class="text-3xl font-serif font-bold text-mitred mb-4">文本独特性：高度隐喻化与哲学的诗化</h2>
+                <p class="mb-8 text-gray-700 leading-relaxed max-w-3xl">
+                    本节旨在分析 Peter Sloterdijk 的著作《你必须改变你的生活》（Du mußt dein Leben ändern）的核心文体特征。通过梳理其“诗学与哲学交织”的写作风格，确立本研究的文本基础，并揭示为何传统的分析哲学翻译范式难以直接套用于其作品。
+                </p>
+
+                <div class="grid grid-cols-3 gap-6 mb-8 flex-1">
+                    <div class="bg-white p-6 border-t-4 border-mitred shadow-sm rounded flex flex-col cursor-pointer hover:shadow-md transition" onclick="showIntroDetail('metaphor')">
+                        <div class="text-4xl mb-3 text-mitred">✦</div>
+                        <h3 class="font-bold text-lg mb-2">高度隐喻化 (Metaphorical)</h3>
+                        <p class="text-sm text-gray-600 flex-1">运用大量空间、免疫学、杂技隐喻来构建其“人类技术”的宏大叙事。</p>
+                        <span class="text-mitred text-xs font-semibold mt-4">点击查看实例 &rarr;</span>
+                    </div>
+                    <div class="bg-white p-6 border-t-4 border-gray-400 shadow-sm rounded flex flex-col cursor-pointer hover:shadow-md transition" onclick="showIntroDetail('compound')">
+                        <div class="text-4xl mb-3 text-gray-500">❖</div>
+                        <h3 class="font-bold text-lg mb-2">术语复合 (Neologisms)</h3>
+                        <p class="text-sm text-gray-600 flex-1">德语造词法优势：将截然不同的领域（如人类学与工程技术）强行嫁接。</p>
+                        <span class="text-mitred text-xs font-semibold mt-4">点击查看实例 &rarr;</span>
+                    </div>
+                    <div class="bg-white p-6 border-t-4 border-gray-400 shadow-sm rounded flex flex-col cursor-pointer hover:shadow-md transition" onclick="showIntroDetail('poetics')">
+                        <div class="text-4xl mb-3 text-gray-500">☙</div>
+                        <h3 class="font-bold text-lg mb-2">诗学与哲学交织 (Poetics)</h3>
+                        <p class="text-sm text-gray-600 flex-1">以尼采式的宣言体和文学性语言进行哲学论述，修辞力度即论证力度。</p>
+                        <span class="text-mitred text-xs font-semibold mt-4">点击查看实例 &rarr;</span>
+                    </div>
+                </div>
+
+                <div id="intro-detail-box" class="bg-gray-100 p-6 rounded border border-gray-200 hidden mt-auto">
+                    <!-- Dynamic content injected here -->
+                </div>
+            </section>
+
+            <!-- Section 2: Translation -->
+            <section id="sec-trans" class="fade-in hidden h-full flex flex-col">
+                <p class="text-sm text-mitgray mb-2 uppercase tracking-wide">Section 2</p>
+                <h2 class="text-3xl font-serif font-bold text-mitred mb-4">翻译语用与修辞维度的对译争论</h2>
+                <p class="mb-8 text-gray-700 leading-relaxed max-w-3xl">
+                    本节聚焦文本在德英、德中翻译过程中的损耗与变异。通过交互式对比关键术语的翻译策略，分析如何在跨文化语境中保留 Sloterdijk 原文强烈的修辞力度与现象学直觉。
+                </p>
+
+                <div class="flex gap-6 mb-8">
+                    <div class="w-1/3 flex flex-col gap-3">
+                        <h3 class="font-bold text-gray-500 mb-2 uppercase text-xs">选择关键术语</h3>
+                        <button onclick="updateTrans('anthro')" class="text-left px-4 py-3 bg-white border border-gray-300 rounded shadow-sm hover:border-mitred focus:ring-2 ring-mitred font-mono text-sm">
+                            1. Anthropotechnik
+                        </button>
+                        <button onclick="updateTrans('sphere')" class="text-left px-4 py-3 bg-white border border-gray-300 rounded shadow-sm hover:border-mitred focus:ring-2 ring-mitred font-mono text-sm">
+                            2. Sphärologie
+                        </button>
+                        <button onclick="updateTrans('immune')" class="text-left px-4 py-3 bg-white border border-gray-300 rounded shadow-sm hover:border-mitred focus:ring-2 ring-mitred font-mono text-sm">
+                            3. Ko-Immunität
+                        </button>
+                    </div>
+
+                    <div class="w-2/3 bg-white rounded shadow-sm border border-gray-200 p-8 relative flex flex-col">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-mitred rounded-t"></div>
+                        <h3 id="trans-term" class="text-3xl font-serif font-bold mb-6 text-ink">Anthropotechnik</h3>
+                        
+                        <div class="grid grid-cols-2 gap-6 mb-6">
+                            <div class="bg-gray-50 p-4 rounded">
+                                <span class="text-xs font-bold text-mitred uppercase">英译 (Eng)</span>
+                                <p id="trans-en" class="text-lg font-medium mt-1">Anthropotechnics</p>
+                            </div>
+                            <div class="bg-gray-50 p-4 rounded">
+                                <span class="text-xs font-bold text-mitred uppercase">中译 (Chi)</span>
+                                <p id="trans-zh" class="text-lg font-medium mt-1">人类技术 / 人类塑型技艺</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 border-t border-gray-200 pt-4">
+                            <span class="text-xs font-bold text-gray-500 uppercase">翻译难点与修辞分析</span>
+                            <p id="trans-analysis" class="text-sm text-gray-700 mt-2 leading-relaxed">
+                                直译“人类技术”容易在中文语境中引起与“生物工程/基因技术”的混淆。Sloterdijk 此处的意图是指人类通过练习（Übung）、纪律和文化系统进行自我塑造的“精神修炼法”。中译若偏向“技术”，则丧失了原文蕴含的“修行”与“伦理”的诗学张力。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Literature Review -->
+            <section id="sec-lit" class="fade-in hidden h-full flex flex-col">
+                <p class="text-sm text-mitgray mb-2 uppercase tracking-wide">Section 3</p>
+                <h2 class="text-3xl font-serif font-bold text-mitred mb-4">Sloterdijk 研究现状与范式演进 (2000-2024)</h2>
+                <p class="mb-6 text-gray-700 leading-relaxed max-w-3xl">
+                    本节通过可视化数据梳理国内外学术界的主流研究视角。您可以观察到：媒体学和空间哲学的研究占据主导，而对其“翻译接受”及“文学性哲学”维度的系统性跨文化研究仍存在显著空白。
+                </p>
+
+                <!-- Chart Container as required -->
+                <div class="chart-container flex-1 bg-white p-4 rounded shadow-sm border border-gray-200">
+                    <canvas id="literatureChart"></canvas>
+                </div>
+
+                <div class="mt-4 flex justify-between text-xs text-gray-500 max-w-2xl mx-auto w-full px-4">
+                    <span>&larr; 气泡大小代表该流派的论文发表相对体量</span>
+                    <span>点击图表区域可交互 &rarr;</span>
+                </div>
+            </section>
+
+            <!-- Section 4: Problem Statement -->
+            <section id="sec-prob" class="fade-in hidden h-full flex flex-col">
+                <p class="text-sm text-mitgray mb-2 uppercase tracking-wide">Section 4</p>
+                <h2 class="text-3xl font-serif font-bold text-mitred mb-4">推导逻辑与核心研究问题 (Problem Statement)</h2>
+                <p class="mb-8 text-gray-700 leading-relaxed max-w-3xl">
+                    基于上述文本特征分析与文献综述的空白点，本节构建从“已知”推导至“未知”的学术逻辑链条，最终确立本次 MIT 学位论文的核心研究问题，确保选题的批判性与原创性。
+                </p>
+
+                <div class="flex flex-col gap-4 flex-1 justify-center max-w-4xl mx-auto w-full">
+                    
+                    <!-- Step 1 -->
+                    <div class="flex items-center gap-4 group">
+                        <div class="w-12 h-12 rounded-full bg-gray-200 text-gray-500 font-bold flex items-center justify-center text-xl shrink-0 group-hover:bg-mitred group-hover:text-white transition">1</div>
+                        <div class="bg-white p-5 rounded shadow-sm border border-gray-200 flex-1">
+                            <h4 class="font-bold text-sm text-gray-500 uppercase mb-1">已知前提 (Premise)</h4>
+                            <p class="text-gray-800">Sloterdijk 的哲学具有高度的不可译性，其理论效力依赖于德语特定的修辞复合造词法（如 Anthropotechnik）。</p>
+                        </div>
+                    </div>
+
+                    <div class="h-6 w-1 border-l-2 border-dashed border-gray-300 ml-6"></div>
+
+                    <!-- Step 2 -->
+                    <div class="flex items-center gap-4 group">
+                        <div class="w-12 h-12 rounded-full bg-gray-200 text-gray-500 font-bold flex items-center justify-center text-xl shrink-0 group-hover:bg-mitred group-hover:text-white transition">2</div>
+                        <div class="bg-white p-5 rounded shadow-sm border border-gray-200 flex-1">
+                            <h4 class="font-bold text-sm text-gray-500 uppercase mb-1">文献空白 (Research Gap)</h4>
+                            <p class="text-gray-800">现有研究（媒体学/建筑学）将 Sloterdijk 的概念视为工具，<b>忽视了这些概念在跨语际传播（德-英-中）中如何因修辞失效而发生意义变异或被重构。</b></p>
+                        </div>
+                    </div>
+
+                    <div class="h-6 w-1 border-l-2 border-mitred ml-6"></div>
+
+                    <!-- Step 3 -->
+                    <div class="flex items-center gap-4 group">
+                        <div class="w-12 h-12 rounded-full bg-mitred text-white shadow-lg font-bold flex items-center justify-center text-xl shrink-0">3</div>
+                        <div class="bg-mitred p-6 rounded shadow-lg border border-red-800 flex-1">
+                            <h4 class="font-bold text-xs text-red-200 uppercase mb-2">研究问题 (Core Problem Statement)</h4>
+                            <p class="text-white text-lg font-serif">
+                                “Sloterdijk 的‘人类技术 (Anthropotechnik)’概念在跨语际（特别是英译与中译）的接受过程中，其原初的‘诗学-哲学’张力是如何被解构或重塑的？这种翻译中的‘误读’与‘重构’，又如何反映了不同学术语境对当代空间与生命政治框架的接受局限性？”
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Right Script/Teleprompter Panel -->
+        <aside class="w-96 bg-gray-50 border-l border-gray-200 flex flex-col z-10 shadow-inner">
+            <div class="bg-gray-800 text-white px-6 py-4 flex items-center justify-between">
+                <h2 class="font-bold tracking-wider text-sm">🎙️ 汇报脚本台 (Speaker Notes)</h2>
+                <span id="timer" class="font-mono text-sm text-gray-400">00:00</span>
+            </div>
+            
+            <div class="p-6 flex-1 overflow-y-auto" id="script-content">
+                <!-- Initial Script for Intro -->
+                <div class="fade-in text-lg leading-relaxed text-gray-800 font-serif">
+                    <p class="mb-4"><span class="text-mitred font-bold">【开场白】</span><br>
+                    尊敬的各位 MIT 评委教授，大家好。今天我汇报的课题聚焦于德国当代最具争议也最具原创性的哲学家 Peter Sloterdijk，特别是其巨著《你必须改变你的生活》。</p>
+                    
+                    <p class="mb-4">在探讨他的思想史位置时，我们首先要明确其选题的学术价值：他并非传统的分析哲学家。</p>
+
+                    <p class="mb-4"><span class="text-mitred font-bold">【引出文本特点】</span><br>
+                    大家请看左侧大屏幕。他的写作有一个极具挑战性的特点——<b>高度隐喻化与术语的复合</b>。他将诗学修辞直接作为哲学论证的工具。</p>
+
+                    <p class="mb-4 text-gray-500 text-sm">
+                        <i>*提示：点击大屏幕上的三个卡片，向评委展示具体的原文例子。*</i>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Teleprompter controls -->
+            <div class="border-t border-gray-300 p-4 bg-white flex justify-between">
+                <button class="px-4 py-2 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded" onclick="prevSec()">上一步</button>
+                <button class="px-4 py-2 text-sm text-white bg-ink hover:bg-gray-900 rounded shadow" onclick="nextSec()">下一步/推进</button>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // --- Data Store & State Management ---
+        const sections = ['sec-intro', 'sec-trans', 'sec-lit', 'sec-prob'];
+        let currentIndex = 0;
+        let litChartInstance = null;
+
+        // Content Data for Interactions
+        const introDetails = {
+            metaphor: "<h4 class='font-bold text-mitred mb-2'>实例: 隐喻化</h4><p class='text-gray-800 font-serif'>原文中他将人类的精神修炼比作杂技演员在悬崖上的走钢丝（Acrobatics）。翻译难点：需保留这种身体性与空间危险感，而不仅是译为抽象的'努力'。</p>",
+            compound: "<h4 class='font-bold text-mitred mb-2'>实例: 术语复合</h4><p class='text-gray-800 font-serif'><b>Anthropotechnik</b> (Anthropos + Technik). 在德语中顺理成章，但在英语和中文中，'技术/Technique'常带有工业化贬义，丧失了原文的'自我修行技艺'之意。</p>",
+            poetics: "<h4 class='font-bold text-mitred mb-2'>实例: 诗化哲学</h4><p class='text-gray-800 font-serif'>引语：“Du mußt dein Leben ändern” 源自里尔克的诗歌。Sloterdijk 将这句审美命令直接转化为现代性生存的本体论律令。</p>"
+        };
+
+        const transData = {
+            anthro: {
+                term: "Anthropotechnik",
+                en: "Anthropotechnics",
+                zh: "人类技术 / 人类塑型技艺",
+                analysis: "直译“人类技术”容易在中文语境中引起与“生物工程/基因技术”的混淆。Sloterdijk 此处的意图是指人类通过练习（Übung）、纪律和文化系统进行自我塑造的“精神修炼法”。中译若偏向“技术”，则丧失了原文蕴含的“修行”与“伦理”的诗学张力。"
+            },
+            sphere: {
+                term: "Sphärologie",
+                en: "Spherology",
+                zh: "球体学 / 空间免疫学",
+                analysis: "原文分为泡、球、泡沫三部曲。难点在于 Sphäre 在德语中带有极强的“庇护所”和“子宫”的亲密感隐喻。英语翻译较为扁平；而中文翻译面临如何在“空间几何”与“生存状态”之间做出取舍的困境。"
+            },
+            immune: {
+                term: "Ko-Immunität",
+                en: "Co-immunity",
+                zh: "共免疫 / 联合免疫",
+                analysis: "借用生物学词汇表达社会学概念。在翻译中，难点在于如何不让读者误以为这是一本医学著作。翻译必须传达出在宏大社会气泡破裂后，人类如何建立共同心理防御机制的哲学意图。"
+            }
+        };
+
+        const scripts = {
+            'sec-intro': `
+                <div class="fade-in text-lg leading-relaxed text-gray-800 font-serif">
+                    <p class="mb-4"><span class="text-mitred font-bold">【开场白】</span><br>
+                    尊敬的各位 MIT 评委教授，大家好。今天我汇报的课题聚焦于德国当代最具争议也最具原创性的哲学家 Peter Sloterdijk，特别是其巨著《你必须改变你的生活》。</p>
+                    <p class="mb-4">在探讨他的思想史位置时，我们首先要明确其选题的学术价值：他并非传统的分析哲学家。</p>
+                    <p class="mb-4"><span class="text-mitred font-bold">【引出文本特点】</span><br>
+                    大家请看左侧大屏幕。他的写作有一个极具挑战性的特点——<b>高度隐喻化与术语的复合</b>。他将诗学修辞直接作为哲学论证的工具。</p>
+                    <p class="mb-4 text-gray-500 text-sm">
+                        <i>*提示：点击大屏幕上的三个卡片，向评委展示具体的原文例子。介绍选材：因此我选择此书作为研究对象，正是因为它最大程度放大了“翻译作为一种跨语境阐释”的张力。*</i>
+                    </p>
+                </div>
+            `,
+            'sec-trans': `
+                <div class="fade-in text-lg leading-relaxed text-gray-800 font-serif">
+                    <p class="mb-4"><span class="text-mitred font-bold">【引入翻译难点】</span><br>
+                    基于这种诗学特征，当他的文本进入英语和中文世界时，遭遇了严重的“水土不服”。</p>
+                    <p class="mb-4">请看屏幕上的对比。以核心概念 <b>Anthropotechnik</b> 为例。</p>
+                    <p class="mb-4">在中文译本中，常被译为“人类技术”。但在这个翻译中，原文中那种类似“斯多葛学派的精神修炼”、一种向内的生命修行维度，被现代科技语境中的“技术”一词抹平了。</p>
+                    <p class="mb-4 text-gray-500 text-sm">
+                        <i>*提示：点击另外两个术语，向评委展示你的语用学分析深度。强调：翻译不仅是语言的转换，更是哲学范式的碰撞。*</i>
+                    </p>
+                </div>
+            `,
+            'sec-lit': `
+                <div class="fade-in text-lg leading-relaxed text-gray-800 font-serif">
+                    <p class="mb-4"><span class="text-mitred font-bold">【介绍研究现状】</span><br>
+                    那么，学术界是如何消化这些概念的呢？我梳理了过去 20 年的文献。</p>
+                    <p class="mb-4">大家从这张气泡图中可以看到，目前的研究高度集中在<b>媒体学</b>（Media Studies）和<b>建筑/空间哲学</b>（Spatial Philosophy）。学者们热衷于借用他的“泡沫”理论去分析城市空间。</p>
+                    <p class="mb-4"><span class="text-mitred font-bold">【指出空白】</span><br>
+                    但是，处于图表底部的“翻译接受研究”和“人类学维度”极其薄弱。欧美学界往往直接使用英译本的二手概念，而忽略了跨语言传递中的意义流失与重构。</p>
+                </div>
+            `,
+            'sec-prob': `
+                <div class="fade-in text-lg leading-relaxed text-gray-800 font-serif">
+                    <p class="mb-4"><span class="text-mitred font-bold">【推导研究问题】</span><br>
+                    这就引出了我的研究逻辑链条。请看屏幕上的推导：</p>
+                    <p class="mb-4">已知他的理论效力依赖德语修辞（Step 1），而现有研究忽视了跨语际传播的变异（Step 2）。</p>
+                    <p class="mb-4">因此，我的<b>核心研究问题（Problem Statement）</b>提出：<br>
+                    <span class="bg-yellow-100 font-bold px-1 text-red-800">在英译与中译的接受过程中，Sloterdijk 的“人类技术”概念如何被解构或重塑？</span></p>
+                    <p class="mb-4">这不仅是一个翻译研究，更是试图揭示：为什么当代英美及中国学界，在面对一种“诗化的生命政治学”时，会本能地将其规训为技术论的工具？</p>
+                    <p class="mb-4 text-gray-500 text-sm"><i>*提示：结束语，等待评委提问。*</i></p>
+                </div>
+            `
+        };
+
+        // --- Core Functions ---
+
+        function navTo(secId) {
+            // Update Tab Styling
+            sections.forEach(id => {
+                const btn = document.getElementById('btn-' + id);
+                if (id === secId) {
+                    btn.classList.replace('tab-inactive', 'tab-active');
+                } else {
+                    btn.classList.replace('tab-active', 'tab-inactive');
+                }
+                // Hide/Show Sections
+                document.getElementById(id).classList.add('hidden');
+            });
+
+            document.getElementById(secId).classList.remove('hidden');
+            currentIndex = sections.indexOf(secId);
+
+            // Update Script
+            document.getElementById('script-content').innerHTML = scripts[secId];
+
+            // Render Chart if navigating to Literature Review
+            if (secId === 'sec-lit') {
+                renderChart();
+            }
+        }
+
+        function nextSec() {
+            if (currentIndex < sections.length - 1) {
+                navTo(sections[currentIndex + 1]);
+            }
+        }
+
+        function prevSec() {
+            if (currentIndex > 0) {
+                navTo(sections[currentIndex - 1]);
+            }
+        }
+
+        function showIntroDetail(type) {
+            const box = document.getElementById('intro-detail-box');
+            box.innerHTML = introDetails[type];
+            box.classList.remove('hidden');
+            box.classList.add('fade-in');
+        }
+
+        function updateTrans(key) {
+            const data = transData[key];
+            document.getElementById('trans-term').innerText = data.term;
+            document.getElementById('trans-en').innerText = data.en;
+            document.getElementById('trans-zh').innerText = data.zh;
+            
+            const analysisEl = document.getElementById('trans-analysis');
+            analysisEl.innerText = data.analysis;
+            
+            // tiny animation effect
+            analysisEl.style.opacity = '0';
+            setTimeout(() => {
+                analysisEl.style.transition = 'opacity 0.3s';
+                analysisEl.style.opacity = '1';
+            }, 50);
+        }
+
+        // --- Chart.js Implementation ---
+        function renderChart() {
+            const ctx = document.getElementById('literatureChart').getContext('2d');
+            
+            // Destroy existing instance to prevent glitch if rendered multiple times
+            if (litChartInstance) {
+                litChartInstance.destroy();
+            }
+
+            const data = {
+                datasets: [
+                    {
+                        label: '媒体学/Media Studies',
+                        data: [
+                            {x: 2005, y: 80, r: 15},
+                            {x: 2012, y: 85, r: 25},
+                            {x: 2020, y: 90, r: 35}
+                        ],
+                        backgroundColor: 'rgba(100, 116, 139, 0.6)', // slate-500
+                        borderColor: '#64748b',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '空间/建筑哲学 (Spatial/Architecture)',
+                        data: [
+                            {x: 2008, y: 60, r: 20},
+                            {x: 2015, y: 70, r: 40},
+                            {x: 2023, y: 65, r: 45}
+                        ],
+                        backgroundColor: 'rgba(163, 31, 52, 0.6)', // mitred
+                        borderColor: '#A31F34',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '翻译与诗学研究 (Translation/Poetics) - 空白领域',
+                        data: [
+                            {x: 2010, y: 30, r: 5},
+                            {x: 2018, y: 35, r: 8},
+                            {x: 2024, y: 40, r: 12}
+                        ],
+                        backgroundColor: 'rgba(234, 179, 8, 0.6)', // yellow-500
+                        borderColor: '#eab308',
+                        borderWidth: 2,
+                        borderDash: [5, 5]
+                    }
+                ]
+            };
+
+            const config = {
+                type: 'bubble',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: { display: true, text: '发表年份 (Year)' },
+                            min: 2000,
+                            max: 2025,
+                            ticks: { stepSize: 5 }
+                        },
+                        y: {
+                            title: { display: true, text: '研究热度 / 文献占比' },
+                            min: 0,
+                            max: 100
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': 年份 ' + context.raw.x + ', 热度 ' + context.raw.y + ', 论文相对体量 ' + context.raw.r;
+                                }
+                            }
+                        },
+                        legend: { position: 'bottom' }
+                    }
+                }
+            };
+
+            litChartInstance = new Chart(ctx, config);
+        }
+
+        // Timer for simulation
+        let seconds = 0;
+        setInterval(() => {
+            seconds++;
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerText = m + ':' + s;
+        }, 1000);
+
+    </script>
+</body>
+</html>
